@@ -1,101 +1,178 @@
-## Three-Tier Web Architecture: Step-by-Step Process
+# Three-Tier Web Architecture on AWS
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Building%20a%203-Tier%20Architecture%20on%20AWS.png" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
 
-# Tier Architecture explanation
+## 🧾 Execution Plan: Three-Tier Web Architecture on AWS
 
-- **Web Server**: This is the front part of a web application that displays the website to users. It handles how the site looks and interacts with users, like showing product pages or allowing people to sign up.
+### ✅ Objective:
+To build and deploy a scalable, secure, and highly available Three-Tier Web Application Architecture on AWS using best practices, automation, and monitoring tools.
 
-- **Application Server**: This middle part manages the business logic and processes user actions. For example, it checks the inventory to see if a product is in stock or updates a user's account details.
+---
 
-- **Database Server**: This is the back-end part that stores all the data for the application. It uses databases like MySQL or PostgreSQL to keep track of information.
+### 📋 Prerequisites
+- 📌 AWS Account
+- 📌 Basic knowledge of Linux
 
-Looking for more videos on AWS and DevOps follow me on youtube here [![YouTube Channel](https://img.shields.io/badge/YouTube-Channel-red?logo=youtube&style=flat-square)](https://www.youtube.com/@avizway)
+---
+
+### 🧱 Core AWS Services by Tier
+
+#### 🌐 1. Web Tier (Frontend Layer)
+**Purpose:** Serve static files, handle user requests, and route traffic to the Application Tier.
+
+| Service                         | Purpose                                       |
+|---------------------------------|-----------------------------------------------|
+| Amazon EC2                      | Host Nginx web servers                        |
+| Application Load Balancer (ALB)| Internet-facing ALB for traffic distribution  |
+| Amazon Route 53                 | Domain management and DNS routing             |
+| Amazon ACM                     | Provision and manage HTTPS certificates       |
+| Auto Scaling Group              | Ensure availability and scalability           |
+| Security Groups                 | Control inbound access (HTTP/HTTPS/SSH)       |
+| Amazon AMI                      | Golden image for web server setup            |
+
+#### 🧠 2. Application Tier (Backend Logic)
+**Purpose:** Execute application logic (Node.js), process API requests, and communicate with DB Tier.
+
+| Service                         | Purpose                                       |
+|---------------------------------|-----------------------------------------------|
+| Amazon EC2                      | Run Node.js app server                        |
+| Auto Scaling Group              | Maintain desired number of app servers        |
+| Internal ALB                    | Load balance traffic between app servers      |
+| Amazon S3                       | Store zipped Node.js application package      |
+| Amazon IAM Role                 | Allow EC2 to access S3 and RDS securely       |
+| Amazon AMI                      | Golden image for app server setup             |
+| Security Groups                 | Restrict access only from Web Tier            |
+| PM2                             | Process manager to run app persistently       |
+
+#### 🛢️ 3. Database Tier
+**Purpose:** Store and manage application data securely.
+
+| Service               | Purpose                                        |
+|------------------------|------------------------------------------------|
+| Amazon RDS (MySQL)     | Managed relational database                   |
+| Multi-AZ Deployment    | High availability & failover support          |
+| DB Subnet Group        | Isolate RDS within private subnets            |
+| Security Groups        | Allow traffic only from App Tier (port 3306)  |
+
+#### 🛠️ Cross-Tier & Infrastructure Services
+
+| Service                | Purpose                                                  |
+|------------------------|----------------------------------------------------------|
+| Amazon VPC             | Isolated network for the entire architecture             |
+| Subnets (Public/Private)| Separate workloads logically and securely              |
+| Internet Gateway       | Enable internet access for web tier                      |
+| NAT Gateway            | Allow private instances (app/db) to access the internet  |
+| Elastic IP             | Static IP for NAT Gateway                                |
+| Route Tables           | Control traffic routing between subnets                  |
+| Amazon CloudWatch (optional) | Monitor instance performance, scaling policies |
+
+---
+
+## 🏗️ Architecture of the Project
+
+
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%20AWS%20Three%20Tier%20Web%20Architecture.png" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%2C%203-tier%20Architecture%20Using%20AWS%20Console.webp" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
 
 
 
-![Three-Tier Architecture](https://avinash.s3.amazonaws.com/3tier.png)
+
 
 
 ### Overview
-In this architecture, we have three main layers:
+Three main layers:
 1. **Web Tier**: Handles client requests and serves the front-end website.
 2. **Application Tier**: Processes API requests and handles the business logic.
 3. **Database Tier**: Manages data storage and retrieval.
 
-### Components explanation
+---
 
-#### 1. External Load Balancer (Public-Facing Application Load Balancer)
-- **Role**: This acts as the entry point for all client traffic.
+### Components Explanation
+
+#### 1. External Load Balancer
+- **Role**: Entry point for all client traffic.
 - **Functionality**:
-  - Distributes incoming client requests to the web tier EC2 instances.
-  - Ensures even distribution of traffic for better performance and reliability.
-  - Performs health checks to ensure only healthy instances receive traffic.
+  - Distributes requests to web tier EC2s.
+  - Performs health checks.
 
 #### 2. Web Tier
-- **Role**: Serves the front-end of the application and redirects API calls.
-- **Components**:
-  - **Nginx Webservers**: Running on EC2 instances.
-  - **React.js Website**: The front-end application served by Nginx.
+- **Role**: Serves front-end and routes API calls.
+- **Components**: Nginx on EC2, React.js front-end.
 - **Functionality**:
-  - **Serving the Website**: Nginx serves the static files for the React.js application to the clients.
-  - **Redirecting API Calls**: Nginx is configured to route API requests to the internal-facing load balancer of the application tier.
+  - Serve static files.
+  - Redirect API to internal ALB.
 
-#### 3. Internal Load Balancer (Application Tier Load Balancer)
-- **Role**: Manages traffic between the web tier and the application tier.
+#### 3. Internal Load Balancer
+- **Role**: Manages traffic between Web and App Tier.
 - **Functionality**:
-  - Receives API requests from the web tier.
-  - Distributes these requests to the appropriate EC2 instances in the application tier.
-  - Ensures high availability and load balancing within the application tier.
+  - Routes API calls to App EC2s.
+  - Ensures high availability.
 
 #### 4. Application Tier
-- **Role**: Handles the application logic and processes API requests.
-- **Components**:
-  - **Node.js Application**: Running on EC2 instances.
+- **Role**: Handles business logic.
+- **Components**: Node.js on EC2.
 - **Functionality**:
-  - **Processing Requests**: The Node.js application receives API requests, performs necessary computations or data manipulations.
-  - **Database Interaction**: Interacts with the Aurora MySQL database to fetch or update data.
-  - **Returning Responses**: Sends the processed data back to the web tier via the internal load balancer.
+  - Process requests.
+  - Interact with DB.
+  - Return data to Web Tier.
 
-#### 5. Database Tier (Aurora MySQL Multi-AZ Database)
-- **Role**: Provides reliable and scalable data storage.
+#### 5. Database Tier
+- **Role**: Reliable data storage.
 - **Functionality**:
-  - **Data Storage**: Stores all the application data in a structured format.
-  - **Multi-AZ Setup**: Ensures high availability and fault tolerance by replicating data across multiple availability zones.
-  - **Data Retrieval and Manipulation**: Handles queries and transactions from the application tier to manage the data.
+  - Structured data storage.
+  - Multi-AZ high availability.
+  - SQL queries and transactions.
+
+---
 
 ### Additional Components
 
 #### Load Balancing
-- **Purpose**: Distributes incoming traffic evenly across multiple instances to prevent any single instance from becoming a bottleneck.
-- **Implementation**:
-  - **Web Tier**: The external load balancer distributes traffic to web servers.
-  - **Application Tier**: The internal load balancer distributes API requests to application servers.
+- Ensures even traffic distribution.
+- Implemented at both Web and App tiers.
 
 #### Health Checks
-- **Purpose**: Continuously monitors the health of instances to ensure only healthy instances receive traffic.
-- **Implementation**:
-  - **Web Tier**: Health checks by the external load balancer to ensure web servers are responsive.
-  - **Application Tier**: Health checks by the internal load balancer to ensure application servers are operational.
+- External ALB checks Web EC2s.
+- Internal ALB checks App EC2s.
 
 #### Auto Scaling Groups
-- **Purpose**: Automatically adjusts the number of running instances based on traffic load to maintain performance and cost efficiency.
-- **Implementation**:
-  - **Web Tier**: Auto-scaling based on metrics like CPU usage or request count to add or remove web server instances.
-  - **Application Tier**: Auto-scaling based on similar metrics to adjust the number of application server instances.
+- Web Tier and App Tier auto-scale based on metrics.
 
 #### AWS Certificate Manager (ACM)
-- **Purpose**: Manages SSL/TLS certificates to secure data in transit between clients and your application, ensuring encrypted communication.
-- **Implementation**:
-  - **Certificate Provisioning**: ACM provides and manages SSL/TLS certificates for your domain `learnaws.co.in`.
-  - **Certificate Deployment**: The ACM certificates are associated with the public-facing Application Load Balancer (ALB) to enable HTTPS traffic.
-  - **Automatic Renewal**: ACM automatically renews certificates before they expire, ensuring uninterrupted secure connections.
+- SSL/TLS for `learnaws.co.in`.
+- Auto-renew and bind with external ALB.
 
 #### Amazon Route 53
-- **Purpose**: Manages DNS records and directs user traffic to the appropriate AWS resources, optimizing for performance and reliability.
-- **Implementation**:
-  - **DNS Management**: Route 53 handles DNS queries for the domain `learnaws.co.in`, translating it into IP addresses for your Application Load Balancer.
-  - **Traffic Routing**: Route 53 directs client requests to the public-facing Application Load Balancer based on DNS records.
-  - **Health Checks and Failover**: Optionally, Route 53 performs health checks on your endpoints and can automatically reroute traffic to healthy resources if needed.
+- DNS management for `learnaws.co.in`.
+- Routing and health-check-based failover.
 
+---
 
-### Summary
-This architecture ensures high availability, scalability, and reliability by distributing the load, monitoring instance health, and scaling resources dynamically. The web tier serves the front-end and routes API calls, the application tier handles business logic and interacts with the database, and the database tier provides robust data storage and retrieval.
+### ✅ Summary
+This architecture ensures **high availability**, **scalability**, and **reliability** by:
+- Load balancing traffic across tiers.
+- Monitoring instance health.
+- Auto-scaling based on usage metrics.
+- Isolated networking via VPC and Subnets.
+
