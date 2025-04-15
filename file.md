@@ -234,3 +234,52 @@ unzip aws_3tier_architecture.zip
     - Enable Automated Backups
 12. Click **Create Database**
 
+
+
+
+# ✅ Phase 4: Update App-Tier in S3 with DB Config
+
+---
+
+## 🔹 Step 1: Get Your RDS Endpoint
+1. Go to AWS Console → RDS → Databases  
+2. Click on `my3tireproject`  
+3. Scroll down to **Connectivity & Security**  
+4. Copy the Endpoint  
+👉 Example:  
+`my3tireproject.c0n8k0a0swtz.us-east-1.rds.amazonaws.com`
+
+---
+
+## 🔹 Step 2: Update `DbConfig.js` Locally
+1. On your local machine, go to:  
+```
+C:\Users\Yaswanth Reddy\Videos\AWS Three-Tier Web Architecture\application-code\app-tier
+```
+2. Open `DbConfig.js` and edit it like this:
+```js
+module.exports = Object.freeze({
+    DB_HOST : 'my3tireproject.c0n8k0a0swtz.us-east-1.rds.amazonaws.com',
+    DB_USER : 'admin',
+    DB_PWD : 'yaswanth123',
+    DB_DATABASE : 'webappdb'
+});
+```
+3. Save the file.
+
+---
+
+## 🔹 Step 3: Upload the Updated File to S3
+1. Go to AWS Console  
+2. Navigate to **S3**  
+3. Click your bucket: `3tireproject523182`  
+4. Go to: `application-code → app-tier`  
+5. Click **Upload**  
+6. Select the updated `DbConfig.js` file from your local path:  
+```
+C:\Users\Yaswanth Reddy\Videos\AWS Three-Tier Web Architecture\application-code\app-tier
+```
+7. Click **Upload**  
+👉 If prompted to overwrite the file, choose **Yes** or **Replace**
+
+
