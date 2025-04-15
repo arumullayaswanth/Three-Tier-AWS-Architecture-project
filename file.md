@@ -549,6 +549,164 @@ sudo chkconfig nginx on
 - Generate an **ACM certificate** for your domain name.
 - Add an **A Record** and **CNAME Record** in **Route 53** to map your domain to the Application Load Balancer.
 - Once completed, you can access the application securely with the `https` protocol.
+
+
+
+
+# Phase 7: Web Server Setup and Configuration
+
+## 🔹 Step 1: Create Target Group for Web Server
+**Path:** EC2 → Target Groups → Create target group
+
+1. Choose a target type: **Instances**
+2. Target group name: **web-Target-group**
+3. Protocol & Port: **HTTP:80**
+4. VPC: **3tire-project-vpc**
+5. Click **Next**
+6. Register Targets: Select instance: **web-tier-instance (in us-east-1a)**
+7. Click **Create target group**
+
+---
+
+## 🔹 Step 2: Create Application Load Balancer (ALB)
+**Path:** EC2 → Load Balancers → Create Load Balancer
+
+1. Load Balancer Name: **external-web-alb**
+2. Scheme: **Internet-facing**
+3. IP Address Type: **IPv4**
+4. Network Mapping:  
+   - VPC: **3tire-project-vpc**  
+   - Availability Zones:  
+     - **us-east-1a** → subnet-0b5732bacdd9d400c (web1)  
+     - **us-east-1b** → subnet-052550855814614813 (web2)
+5. Security Groups: **Wen-ALB-Security-group**
+6. Listeners and Routing:  
+   - Protocol: **HTTP**  
+   - Port: **80**  
+   - Default Action: **Forward to web-Target-group**
+7. Click **Create Load Balancer**
+
+---
+
+## 🔹 Step 3: Configure Route 53 Hosted Zone
+**Path:** Route 53 → Hosted Zones → Create hosted zone
+
+1. Domain name: **aluru.site**
+2. Type: **Public hosted zone**
+3. Click **Create hosted zone**
+
+---
+
+## 🔹 Step 4: Create A Record in Route 53
+**Path:** Route 53 → Hosted zones → aluru.site → Create record
+
+1. Record name: *(Leave blank or add www)*
+2. Record type: **A - IPv4 address**
+3. Routing policy: **Simple**
+4. Alias: **Yes**
+5. Alias target: **Choose Application and Classic Load Balancer**
+6. Region: **US East (N. Virginia)**
+7. Alias target value: `dualstack.external-web-alb-xxxx.us-east-1.elb.amazonaws.com`
+8. Alias hosted zone ID: `Z35SXDOTRQ7X7K`
+9. Click **Create record**
+
+---
+
+## 🔹 Step 5: Update Domain Nameservers in Hostinger
+**Path:** https://hpanel.hostinger.com/domain → Domains → aluru.site → Manage → DNS / Nameservers
+
+1. Click **Edit Nameservers**
+2. Paste the 4 NS records from Route 53:  
+   - `ns-865.awsdns-44.net`  
+   - `ns-1995.awsdns-57.co.uk`  
+   - `ns-1418.awsdns-49.org`  
+   - `ns-265.awsdns-33.com`
+3. Click **Save**
+
+---
+
+## 🔹 Step 6: Request HTTPS Certificate using ACM
+**Path:** AWS Certificate Manager → Request Certificate
+
+1. Select: **Request a public certificate**
+2. Click **Next**
+3. Fully qualified domain name: **aluru.site**
+4. Validation method: **DNS validation (recommended)**
+5. Click **Request**
+
+---
+
+## 🔹 Step 7: Validate Domain in Route 53
+**Path:** AWS Certificate Manager → Certificates → Your Certificate ID
+
+1. Under domain, click **Create DNS record in Amazon Route 53**
+2. Select your hosted zone: **aluru.site**
+3. Click **Create record**
+4. Wait a few minutes for validation to complete
+
+---
+
+## 🔹 Step 8: Add HTTPS Listener to ALB
+**Path:** EC2 → Load Balancers → external-web-alb → Listeners → Add listener
+
+1. Protocol: **HTTPS**
+2. Port: **443**
+3. Default action: **Forward to web-Target-group**
+4. Security policy: **ELBSecurityPolicy-2021-06** (or latest)
+5. Certificate from ACM: Select the one for **aluru.site**
+6. Click **Add**
+
+---
+
+# Phase 8: App Server Setup (Auto Scaling)
+
+## ✅ Step 1: Create AMI from App Tier Instance
+
+1. Go to EC2 → Instances
+2. Select the App-tier EC2 instance
+3. Click **Actions** → **Image and templates** → **Create image**
+4. Image name: **App-tier-gold-AMI**
+5. Click **Create image**
+
+---
+
+## ✅ Step 2: Create Launch Template for App Tier
+
+1. Go to EC2 → Launch Templates → Create launch template
+2. Launch template name: **App-Launch-template**
+3. Template version description: **App-Launch-template(v1)**
+4. ✅ Check "Provide guidance to help me set up a template for EC2 Auto Scaling"
+5. AMI: **App-tier-gold-AMI**
+6. Instance type: **t2.micro**
+7. Key pair: **my-Key-pair**
+8. Security group: **APP-Security-group (sg-00d21f6e0ae74e57f)**
+9. IAM instance profile: **3-tire-project-role**
+10. Click **Create launch template**
+
+---
+
+## ✅ Step 3: Create Auto Scaling Group for App Tier
+
+1. Go to EC2 → Auto Scaling Groups → Create Auto Scaling group
+2. Name: **app-tier-Auto-Scaling-group**
+3. Launch template: **App-Launch-template**
+4. VPC: **3-tire-project-vpc**
+5. Subnets:  
+   - **us-east-1a** → subnet-APP1-us-east-1a  
+   - **us-east-1b** → subnet-APP2-us-east-1b
+6. Load balancing:  
+   - ✅ Attach to an existing load balancer  
+   - ALB: **app-int-alb | HTTP**  
+   - Target group: **app-Target-group**
+7. Group size and scaling:  
+   - Desired capacity: **2**  
+   - Min: **2**  
+   - Max: **2**
+8. Tags:  
+   - Key: **Name**  
+   - Value: **APP-tier-instance**
+9. Click **Create Auto Scaling group**
+
   
 
 
