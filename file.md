@@ -617,10 +617,10 @@ sudo chkconfig nginx on
 
 1. Click **Edit Nameservers**
 2. Paste the 4 NS records from Route 53:  
-   - `ns-865.awsdns-44.net`  
-   - `ns-1995.awsdns-57.co.uk`  
-   - `ns-1418.awsdns-49.org`  
-   - `ns-265.awsdns-33.com`
+   - `ns-865.awsdns-84.net`  
+   - `ns-1995.awsdns-97.co.uk`  
+   - `ns-1418.awsdns-59.org`  
+   - `ns-265.awsdns-73.com`
 3. Click **Save**
 
 ---
