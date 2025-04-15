@@ -283,3 +283,187 @@ C:\Users\Yaswanth Reddy\Videos\AWS Three-Tier Web Architecture\application-code\
 👉 If prompted to overwrite the file, choose **Yes** or **Replace**
 
 
+
+# Phase 5: Create Application Tier Resources Including Internal Load Balancer
+
+## ✅ STEP 1: Launch EC2 Instance for Application Tier
+1. Go to **EC2 → Instances → Launch an Instance**
+2. Set Name: `App-tier-instance`
+3. Application and OS Image (AMI):  
+   - Select: `Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type`
+4. Instance Type: `t2.micro`
+5. Key Pair:  
+   - Choose: `my-Key pair`
+6. Network Settings → Click Edit  
+   - VPC: `3tire-project-vpc`  
+   - Subnet: `3tire-project-subnet-APP1-us-east-1a`  
+   - Firewall (Security Group): `APP-Security-groupsg-00d21f6e0ae74e57f`
+7. Advanced Details:  
+   - IAM Role: `3-tire-project-role`
+8. Click **Launch Instance**
+
+---
+
+## ✅ STEP 2: Connect to App-tier EC2 via Session Manager
+1. Go to **EC2 → Instances**
+2. Select `App-tier-instance`
+3. Click **Connect → Session Manager → Connect**
+
+---
+
+## ✅ STEP 3: Switch to Root User
+```bash
+sudo su
+cd /home/ec2-user/
+```
+
+---
+
+## ✅ STEP 4: Install MySQL Client
+```bash
+sudo yum install mysql -y
+```
+
+---
+
+## ✅ STEP 5: Connect to RDS Database
+```bash
+mysql -h my3tireproject.c0n8k0a0swtz.us-east-1.rds.amazonaws.com -u admin -p
+# Enter your password: yaswanth123
+```
+
+---
+
+## ✅ STEP 6: Run SQL Commands in MySQL Shell
+```sql
+CREATE DATABASE webappdb;
+USE webappdb;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT NOT NULL AUTO_INCREMENT,
+    amount DECIMAL(10,2),
+    description VARCHAR(100),
+    PRIMARY KEY(id)
+);
+
+SHOW TABLES;
+
+INSERT INTO transactions (amount, description) VALUES ('400', 'groceries');
+
+SELECT * FROM transactions;
+exit;
+```
+
+---
+
+## ✅ STEP 7: Install Node.js and PM2
+```bash
+curl -o- https://raw.githubusercontent.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/master/install.sh | bash
+source ~/.bashrc
+nvm install 16
+nvm use 16
+npm install -g pm2
+```
+
+---
+
+## ✅ STEP 8: Download App Code from S3
+```bash
+cd ~/
+aws s3 cp s3://3tireproject523182/application-code/app-tier/ app-tier --recursive
+cd ~/app-tier
+```
+
+---
+
+## ✅ STEP 9: Start Node.js App with PM2
+```bash
+npm install
+pm2 start index.js
+pm2 status
+pm2 logs
+pm2 startup
+pm2 save
+```
+
+---
+
+## ✅ STEP 10: Verify App is Running
+```bash
+curl http://localhost:4000/health
+# ✅ Output: This is the health check.
+```
+
+---
+
+## ✅ STEP 11: Create Target Group for Internal Load Balancer
+1. Go to **EC2 → Target Groups → Create Target Group**
+2. Target type: `Instances`
+3. Target group name: `app-int-alb`
+4. Protocol: `HTTP`
+5. Port: `4000`
+6. VPC: `3tire-project-vpc`
+7. Health Checks:  
+   - Path: `/health`
+8. Click **Next → Register Targets**  
+   - Select your `App-tier-instance`
+9. Click **Create Target Group**
+
+---
+
+## ✅ STEP 12: Create Internal Application Load Balancer
+1. Go to **EC2 → Load Balancers → Create Load Balancer**
+2. Select: `Application Load Balancer`
+3. Name: `app-int-lb`
+4. Scheme: `Internal`
+5. VPC: `3tire-project-vpc`
+6. Availability Zones:  
+   - `us-east-1a`: `3tire-project-subnet-APP1-us-east-1a`  
+   - `us-east-1b`: `3tire-project-subnet-APP2-us-east-1b`
+7. Security Group: `int-alb-Security-group`
+8. Listener & Routing:  
+   - Protocol: `HTTP`  
+   - Port: `80`  
+   - Forward to Target Group: `app-int-alb`
+9. Click **Create Load Balancer**
+
+---
+
+## ✅ STEP 13: Get Internal Load Balancer DNS
+1. Go to **EC2 → Load Balancers**
+2. Select: `app-int-lb`
+3. Under **Details**, copy the DNS name:  
+   ```
+   internal-app-int-lb-1744284757.us-east-1.elb.amazonaws.com
+   ```
+
+---
+
+## ✅ STEP 14: Update nginx.conf File on Your Local Machine
+1. Navigate to:  
+   `C:\\Users\\Yaswanth Reddy\\Videos\\AWS Three-Tier Web Architecture\\application-code`
+2. Open `nginx.conf` in a text editor (Notepad++ or VS Code)
+3. Add the following under the API proxy section:
+```nginx
+#proxy for internal lb
+location /api/ {
+    proxy_pass http://internal-app-int-lb-1744284757.us-east-1.elb.amazonaws.com:80/;
+}
+```
+4. Save the file.
+
+---
+
+## ✅ STEP 15: Upload Updated Files to Amazon S3
+1. Go to **AWS Console → S3 → Buckets**
+2. Select your bucket: `3tireproject523182`
+3. Navigate to: `application-code/`
+4. Click **Upload → Add Files**
+   - Browse and select:  
+     - `nginx.conf`  
+     - `DbConfig.js`
+5. Click **Upload**
+   - Confirm overwrite if prompted.
+
+
+
