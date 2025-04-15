@@ -689,23 +689,201 @@ sudo chkconfig nginx on
 
 1. Go to EC2 → Auto Scaling Groups → Create Auto Scaling group
 2. Name: **app-tier-Auto-Scaling-group**
-3. Launch template: **App-Launch-template**
+3. Launch template: **App-Launch-template** --> Click Next
 4. VPC: **3-tire-project-vpc**
 5. Subnets:  
    - **us-east-1a** → subnet-APP1-us-east-1a  
    - **us-east-1b** → subnet-APP2-us-east-1b
-6. Load balancing:  
+6.	Click Next
+7. Load balancing:  
    - ✅ Attach to an existing load balancer  
    - ALB: **app-int-alb | HTTP**  
    - Target group: **app-Target-group**
-7. Group size and scaling:  
+8. Click Next
+9. Group size and scaling:  
    - Desired capacity: **2**  
    - Min: **2**  
    - Max: **2**
-8. Tags:  
+10. Tags:  
    - Key: **Name**  
    - Value: **APP-tier-instance**
-9. Click **Create Auto Scaling group**
+11. Click **Create Auto Scaling group**
+
+
+
+# Phase 9: WEB SERVER SETUP (Auto Scaling)
+
+---
+
+✅ **Step 1: Create AMI from Web Tier Instance**  
+1. Go to EC2 → Instances  
+2. Select the Web-tier EC2 instance  
+3. Click **Actions → Image and templates → Create image**  
+4. Image name: `web-tier-gold-AMI`  
+5. Description: `web-tier-resources` (optional)  
+6. Click **Create image**  
+
+---
+
+✅ **Step 2: Create Launch Template for Web Tier**  
+1. Go to EC2 → Launch Templates → Create launch template  
+2. Launch template name: `web-Launch-template`  
+3. Template version description: `WEB-Launch-template(v1)`  
+4. Check ✅ "Provide guidance to help me set up a template for EC2 Auto Scaling"  
+5. AMI: Select `web-tier-gold-AMI`  
+6. Instance type: `t2.micro`  
+7. Key pair: `my-Key-pair`  
+8. Security group: Select `web-server-Security-group`  
+9. Expand Advanced details  
+   - IAM instance profile: `3-tire-project-role`  
+10. Click **Create launch template**  
+
+---
+
+✅ **Step 3: Create Auto Scaling Group for Web Tier**  
+1. Go to EC2 → Auto Scaling Groups → Create Auto Scaling group  
+2. Auto Scaling group name: `web-tier-Auto-Scaling`  
+3. Launch template: Select `web-Launch-template`  
+4. Click **Next**  
+5. Network: Select `3-tire-project-vpc`  
+6. Subnets:  
+   - `us-east-1a` → `subnet-web1-us-east-1a`  
+   - `us-east-1b` → `subnet-web2-us-east-1b`  
+7. Click **Next**  
+8. Load balancing:  
+   - ✅ Attach to an existing load balancer  
+   - Choose: `external-web-alb | HTTP`  
+   - Target group: `web-Target-group`  
+9. Click **Next**  
+10. Group size and scaling:  
+   - Desired capacity: 2  
+   - Min: 2  
+   - Max: 2  
+11. Click **Next**  
+12. Tags:  
+   - Key: `Name`  
+   - Value: `web-tier-instance`  
+13. Click **Next → Review → Create Auto Scaling group**  
+
+# Phase 10: Delete Entire 3-Tier AWS Project – Step-by-Step
+
+---
+
+**Step 1: Delete Auto Scaling Groups**  
+1. Go to EC2 → Auto Scaling Groups  
+2. Select:  
+   - `web-tier-Auto-Scaling`  
+   - `app-tier-Auto-Scaling-group`  
+3. Click **Actions → Delete**  
+
+---
+
+**Step 2: Delete Load Balancers**  
+1. Go to EC2 → Load Balancers  
+2. Select:  
+   - `app-int-alb`  
+   - `external-web-alb`  
+3. Click **Actions → Delete**  
+
+---
+
+**Step 3: Delete Target Groups**  
+1. Go to EC2 → Target Groups  
+2. Select:  
+   - `app-int-alb`  
+   - `web-Target-group`  
+3. Click **Actions → Delete**  
+
+---
+
+**Step 4: Deregister AMIs**  
+1. Go to EC2 → AMIs  
+2. Select:  
+   - `App-tire-gold-AMI`  
+   - `web-tire-gold-AMI`  
+3. Click **Actions → Deregister**  
+
+---
+
+**Step 5: Delete Snapshots**  
+1. Go to EC2 → Snapshots  
+2. Select the 2 associated snapshots  
+3. Click **Actions → Delete**  
+
+---
+
+**Step 6: Delete RDS/Aurora Database**  
+1. Go to RDS → Databases  
+2. Select: `my3tireproject`  
+3. Click **Actions → Delete**  
+4. Confirm:  
+   - ✅ Check the acknowledgment  
+   - Type `delete me`  
+   - Click **Delete**  
+
+---
+
+**Step 7: Delete S3 Bucket**  
+1. Go to S3  
+2. Select the relevant bucket (e.g., `app-deployment-bucket`)  
+3. Click **Empty → then Delete Bucket**  
+
+---
+
+**Step 8: Delete SSL Certificate**  
+1. Go to AWS Certificate Manager  
+2. Go to Certificates  
+3. Select your SSL cert (e.g., for `aluru.site`)  
+4. Click **Delete**  
+
+---
+
+**Step 9: Delete Route 53 Records & Hosted Zone**  
+1. Go to Route 53 → Hosted Zones  
+2. Select `aluru.site`  
+3. Delete the record:  
+   - `A` record pointing to `external-web-alb`  
+4. Then, delete the hosted zone: `aluru.site`  
+
+---
+
+**Step 10: Terminate EC2 Instances & Delete Security Groups**  
+
+**A. Terminate Instances**  
+1. Go to EC2 → Instances  
+2. Select:  
+   - `App-tier-instance`  
+   - `web-tier-instance(1a)`  
+3. Click **Instance State → Terminate**  
+
+**B. Delete Security Groups**  
+1. Go to EC2 → Security Groups  
+2. Select and delete:  
+   - `APP-Security-group`  
+   - `web-server-Security-group`  
+   - `RDS-security-group`  
+   - `int-alb-Security-group`  
+   - `web-ALB-Security-group`  
+
+---
+
+**Step 11: Delete NAT Gateway, Elastic IP, and VPC**  
+
+**A. Delete NAT Gateway**  
+1. Go to VPC → NAT Gateways  
+2. Select: `3tire-project-nat-public1-us-east-1a`  
+3. Click **Actions → Delete**  
+
+**B. Release Elastic IP**  
+1. Go to EC2 → Elastic IPs  
+2. Select: `3tire-project-eip-us-east-1a`  
+3. Click **Actions → Release Elastic IP**  
+
+**C. Delete VPC**  
+1. Go to VPC → Your VPCs  
+2. Select: `3tire-project-vpc`  
+3. Click **Actions → Delete**
+
 
   
 
