@@ -1,4 +1,12 @@
 # Three-Tier Web Architecture on AWS
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Building%20a%203-Tier%20Architecture%20on%20AWS.png" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
 
 ## 🧾 Execution Plan: Three-Tier Web Architecture on AWS
 
@@ -67,6 +75,40 @@ To build and deploy a scalable, secure, and highly available Three-Tier Web Appl
 ---
 
 ## 🏗️ Architecture of the Project
+
+
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%20AWS%20Three%20Tier%20Web%20Architecture.png" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%2C%203-tier%20Architecture%20Using%20AWS%20Console.webp" width="90%">
+      <br><b style="color:#1f75fe;">🔵 Architecture</b>
+    </td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <td align="center" width="50%" style="background-color:#fdfefe; padding:15px; border:1px solid #dcdcdc;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%20AWS%20Three%20Tier%20Web%20Architecture.png" width="100%">
+      <br><b style="color:#0073e6;">🔷 Three-Tier Web Architecture</b>
+    </td>
+    <td align="center" width="50%" style="background-color:#fdfefe; padding:15px; border:1px solid #dcdcdc;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%2C%203-tier%20Architecture%20Using%20AWS%20Console.webp" width="100%">
+      <br><b style="color:#0073e6;">🔷 AWS Console View</b>
+    </td>
+  </tr>
+</table>
+
 
 ### Overview
 Three main layers:
@@ -223,6 +265,14 @@ Navigate to: **VPC Dashboard → Subnets**, and follow the renaming process:
    ➤ Rename to: `3tire-project-subnet-web2-us-east-1b` (✅ already correct)  
    ➤ Click **Save**
 
+<table>
+  <tr>
+    <td align="center" style="background-color:#f0f8ff; padding:10px;">
+      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Screenshot%202025-04-14%20193604.png" width="90%">
+      <br><b style="color:#1f75fe;">🔵 VPC</b>
+    </td>
+  </tr>
+</table>
 ---
 
 ## ✅ Result
