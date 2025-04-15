@@ -96,34 +96,7 @@ To build and deploy a scalable, secure, and highly available Three-Tier Web Appl
 </table>
 
 
-<div style="background:#f9f9ff; border-radius:10px; padding:20px; margin:10px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-  <div align="center">
-    <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%20AWS%20Three%20Tier%20Web%20Architecture.png" width="80%">
-    <p><b style="color:#003366;">🧩 Web Architecture - Overview</b></p>
-  </div>
-</div>
 
-<div style="background:#f9f9ff; border-radius:10px; padding:20px; margin:10px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-  <div align="center">
-    <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%2C%203-tier%20Architecture%20Using%20AWS%20Console.webp" width="80%">
-    <p><b style="color:#003366;">🧩 AWS Console - Architecture Build</b></p>
-  </div>
-</div>
-
-<table>
-  <tr>
-    <td style="border:1px solid #d1e7ff; background:#eaf6ff; padding:15px; text-align:center;">
-      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%20AWS%20Three%20Tier%20Web%20Architecture.png" width="90%">
-      <br><b style="color:#0056b3;">🔹 Architecture – Web Tier Overview</b>
-    </td>
-  </tr>
-  <tr>
-    <td style="border:1px solid #d1e7ff; background:#eaf6ff; padding:15px; text-align:center;">
-      <img src="https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/blob/ba799da6d68cf3817b9d4108e9511f826f812f32/pictures/Design%20Diagram%2C%203-tier%20Architecture%20Using%20AWS%20Console.webp" width="90%">
-      <br><b style="color:#0056b3;">🔹 Architecture – AWS Console View</b>
-    </td>
-  </tr>
-</table>
 
 
 
