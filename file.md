@@ -464,6 +464,92 @@ location /api/ {
      - `DbConfig.js`
 5. Click **Upload**
    - Confirm overwrite if prompted.
+  
+
+
+ 
+# Phase 6: Web Tier Setup – Launch EC2 Instance in Web Subnets (Custom VPC)
+
+## ✅ STEP 1: Launch EC2 Instance in Web Subnet
+1. Go to **EC2 → Instances → Launch Instance**
+2. **Name**: `web-tier-instance(1a)`
+3. **Application and OS Images (AMI)**:  
+   Select → `Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type`
+4. **Instance type**: `t2.micro`
+5. **Key pair (login)**: Select → `my-Key pair`
+6. **Network settings**:
+   - **VPC**: `vpc-0ca0b401d854f068b (3tire-project-vpc)`
+   - **Subnet**: `subnet-0b5732bacdd9d400c3 (web1-us-east-1a)`
+   - **Auto-assign Public IP**: `Enable`
+   - **Firewall (Security Groups)**: Select → `web-server-Security-groupsg-0291f2a05e8571591`
+7. **Advanced details**:
+   - **IAM Role**: Select → `3-tire-project-role`
+8. Click **Launch Instance**
+
+---
+
+## ✅ STEP 2: Connect to Web Tier Instance
+1. Go to **EC2 → Instances**
+2. Select `web-tier-instance(1a)`
+3. Click **Connect → Session Manager → Connect**
+
+```bash
+sudo su ec2-user
+cd /home/ec2-user/
+pwd
+```
+
+---
+
+## ✅ STEP 3: Install Node.js & Nginx
+
+```bash
+curl -o- https://raw.githubusercontent.com/arumullayaswanth/Three-Tier-AWS-Architecture-project/master/install.sh | bash
+source ~/.bashrc
+nvm install 16
+nvm use 16
+```
+
+---
+
+## ✅ STEP 4: Download Web Tier Code from S3
+
+```bash
+cd ~/
+aws s3 cp s3://3tireproject523182/application-code/web-tier/ web-tier --recursive
+cd ~/web-tier
+npm install
+npm run build
+```
+
+---
+
+## ✅ STEP 5: Install and Configure NGINX
+
+```bash
+sudo amazon-linux-extras install nginx1 -y
+cd /etc/nginx
+sudo rm nginx.conf
+sudo aws s3 cp s3://3tireproject523182/application-code/nginx.conf nginx.conf
+sudo service nginx restart
+```
+
+---
+
+## ✅ STEP 6: Permissions and Auto Start
+
+```bash
+chmod -R 755 /home/ec2-user
+sudo chkconfig nginx on
+```
+
+---
+
+## ✅ Additional Configuration:
+- Generate an **ACM certificate** for your domain name.
+- Add an **A Record** and **CNAME Record** in **Route 53** to map your domain to the Application Load Balancer.
+- Once completed, you can access the application securely with the `https` protocol.
+  
 
 
 
