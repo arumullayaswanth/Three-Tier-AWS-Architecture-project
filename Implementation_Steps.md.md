@@ -286,7 +286,7 @@ Once created, AWS will automatically set up:
 1. Open Terminal (Mac/Linux) or Git Bash / Command Prompt (Windows)
 2. Run the following commands:
 ```bash
-git clone https://github.com/avizway1/aws_3tier_architecture.git
+git colne https://github.com/arumullayaswanth/Three-Tier-AWS-Architecture-project.git
 cd aws_3tier_architecture
 ```
 3. If the repository contains a ZIP file, unzip it:
